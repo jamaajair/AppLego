@@ -1,6 +1,7 @@
 package org.spftech.backend.seeders;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,6 +15,7 @@ import org.spftech.backend.entity.*;
 import org.spftech.backend.repository.*;
 
 @Component
+@Order(1)
 public class DossierDBSeeder implements CommandLineRunner {
 
     @Autowired

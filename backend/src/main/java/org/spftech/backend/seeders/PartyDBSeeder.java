@@ -1,6 +1,7 @@
 package org.spftech.backend.seeders;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import org.spftech.backend.entity.Party.*;
 import org.spftech.backend.repository.*;
 
 @Component
+@Order(2)
 public class PartyDBSeeder implements CommandLineRunner {
 
     @Autowired
@@ -19,7 +21,6 @@ public class PartyDBSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Optionnel : vider la table avant insertion
         // partyRepository.deleteAll();
 
         List<Party> parties = Arrays.asList(

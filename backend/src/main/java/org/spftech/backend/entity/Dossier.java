@@ -1,10 +1,7 @@
 package org.spftech.backend.entity;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +24,7 @@ public class Dossier {
     @Column(length = 250)
     private String label;
 
+    @Column(nullable = false)
     private Date createdAt;
 
     @Column(length = 4000)
