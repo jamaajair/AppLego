@@ -6,38 +6,32 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
-import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
 @Entity
-@Table(name = "document_related_set")
 @Data
 @NoArgsConstructor
 public class DocumentRelatedSet {
 
     @EmbeddedId
-    private DocumentRelatedSetIdComposite id;
+    private DocumentRelatedSetId id;
 
-    // @Column(name = "document_n")
-    // private Long documentN;
-    @MapsId("documentN")
+    @MapsId("document")
     @ManyToOne
-    @JoinColumn(name = "DOCUMENT", referencedColumnName = "ref")
+    @JoinColumn(name = "document", referencedColumnName = "ref")
     private DocumentReference document;
 
-    // @Column(name = "in_set_n")
-    // private Long inSetN;
-    @MapsId("inSetN")
+    @MapsId("inSet")
     @ManyToOne
-    @JoinColumn(name = "IN_SET", referencedColumnName = "ref")
-    private DocumentSet documentSet;
+    @JoinColumn(name = "in_set", referencedColumnName = "ref")
+    private DocumentSet inSet;
 
     @ManyToOne
-    @JoinColumn(name = "role", referencedColumnName = "code")
-    private DocumentRole role;
+    @JoinColumn(name = "role_in_set", referencedColumnName = "code")
+    private DocumentRole roleInSet;
 
-    @Column(name = "rank_in_sft")
-    private Integer rank;
+    @Column(name = "rank_in_set")
+    private Integer rankInSet;
 }

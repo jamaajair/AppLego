@@ -33,5 +33,5 @@ public class DocumentType{
     private String labelDe;
 
     @Column(name = "equivalent_cdis_doctype", length=15, nullable=false)
-    private String equivalent_cdis_doctype;
+    private String equivalentCdisDoctype;
 }

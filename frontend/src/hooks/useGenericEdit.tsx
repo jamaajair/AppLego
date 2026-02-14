@@ -1,9 +1,8 @@
-// typescript
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { PageConfig } from "../types/config";
 import { api } from "../services/api";
-import type { GenericFormResult } from "../types/hooks";
+import type { GenericFormResult } from "../types/GenericFormResult";
 
 export default function useGenericEdit<T = Record<string, unknown>>(
     configPath?: string | null,

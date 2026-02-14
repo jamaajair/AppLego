@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import type {GridRowParams} from "@mui/x-data-grid";
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
+import type { LinkKind } from '../../types/linkKind.ts';
+
 
 
 const MyDossiers: FC = () => {

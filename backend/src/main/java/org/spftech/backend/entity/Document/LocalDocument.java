@@ -1,16 +1,22 @@
 package org.spftech.backend.entity.Document;
 
-import jakarta.persistence.*;
+import java.util.Date;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import java.sql.Date;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Data
 @AllArgsConstructor
-@Table(name = "local_document")
 @Entity
 @NoArgsConstructor
 public class LocalDocument {
@@ -20,7 +26,7 @@ public class LocalDocument {
     @Column(name = "ref")
     private Long ref;
 
-    @OneToOne(mappedBy = "local_Document", cascade = CascadeType.ALL, optional = false)
+    @OneToOne(mappedBy = "localDocument", cascade = CascadeType.ALL, optional = false)
     private DocumentReference documentReference;
 
     @Column(name = "label", length = 250, nullable = false)
@@ -30,7 +36,7 @@ public class LocalDocument {
     @JoinColumn(name = "type", referencedColumnName = "code", nullable = false)
     private DocumentType type;
 
-    @Column(name = "published_date", nullable = false)
+    @Column(name = "published", nullable = false)
     private Date published;
 
     @ManyToOne
@@ -38,5 +44,5 @@ public class LocalDocument {
     private DocumentState state;
 
     @Column(name = "archived_as_doc_ref")
-    private short archived_as_docRef; 
+    private short archivedAsDocRef; 
 }

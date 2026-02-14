@@ -1,5 +1,4 @@
 import './App.css';
-import Layout from "./components/Layout";
 import { RouterProvider } from "react-router-dom";
 import router from "./services/router";
 

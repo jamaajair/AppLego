@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, TextField, MenuItem, Button, Typography, Alert } from "@mui/material";
 
 const GenericForm = ({

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   Button, CircularProgress, Typography, Box,
   Paper, List, ListItem, ListItemText
@@ -61,7 +61,7 @@ export default function AddStakeholder({ dossierRef }: DossierStakeholdersProps)
                                 <ListItem key={p.ref} divider>
                                 <ListItemText primary={p.label} />
                                 <ListItemText secondary={p.kind} />
-                                <ListItemText secondary={`Rôle: ${p.role.labelFr}`} />
+                                <ListItemText secondary={`Rôle: ${p.role?.labelFr}`} />
                                 </ListItem>
                             ))
                         )}

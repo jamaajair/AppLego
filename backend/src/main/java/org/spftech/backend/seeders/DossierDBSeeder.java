@@ -19,6 +19,9 @@ import org.spftech.backend.repository.*;
 public class DossierDBSeeder implements CommandLineRunner {
 
     @Autowired
+    private CodeRepository codeRepository;
+
+    @Autowired
     private DossierRepository dossierRepository;
 
     @Autowired
@@ -28,14 +31,36 @@ public class DossierDBSeeder implements CommandLineRunner {
     private DossierStateRepository dossierStateRepository;
 
     @Autowired
-    private CodeRepository codeRepository;
+    private LinkKindRepository linkKindRepository;
+
+    @Autowired
+    private LinkedDossierRepository linkedDossierRepository;
+
+    @Autowired
+    private CollaboratorRepository collaboratorRepository;
+
+    @Autowired
+    private DossierRelatedCollaboratorRepository dossierRelatedCollaboratorRepository;
 
     @Override
     public void run(String... args) throws Exception {
-        // codeRepository.deleteAll();
-        // dossierRepository.deleteAll();
-        // dossierTypeRepository.deleteAll();
-        // dossierStateRepository.deleteAll();
+        dossierRelatedCollaboratorRepository.deleteAll();
+        dossierRelatedCollaboratorRepository.resetAutoIncr();
+        dossierRepository.deleteAll();
+        dossierTypeRepository.deleteAll();
+        dossierStateRepository.deleteAll();
+        collaboratorRepository.deleteAll();
+        collaboratorRepository.resetAutoIncr();
+
+        List<String> users = Arrays.asList("Nathan", "Jamaa", "Pierre", "Jerome", "Alexandre");
+        List<Collaborator> collaborators = new ArrayList<>();
+        for (int i = 0; i < users.size(); i++) {
+            String name = users.get(i);
+            String userId =  users.get(i) + "Id";
+            Collaborator collaborator = new Collaborator(name, userId);
+            collaborators.add(collaborator);
+        }
+        collaboratorRepository.saveAll(collaborators);
 
         // Correction : l'ordre des paramètres attendu est (code, label_nl, label_en, label_fr, label_de, usage_context)
         // et le code est généralement présent dans les diagrammes uml (sinon, en utiliser un court pour l'exemple).
@@ -122,6 +147,46 @@ public class DossierDBSeeder implements CommandLineRunner {
         }
 
         dossierRepository.saveAll(dossiers);
+
+        List<DossierRelatedCollaborator> drcs = new ArrayList<>();
+        for(int i=0; i < dossiers.size(); i++){
+            Collaborator collaborator = collaborators.get(i % collaborators.size());
+            Dossier dossier = dossiers.get(i);
+
+            Calendar cal = Calendar.getInstance();
+            Date fromDate = cal.getTime();
+
+            Calendar closeCal = (Calendar) cal.clone();
+            closeCal.add(Calendar.DAY_OF_MONTH, 90);
+            Date toDate = closeCal.getTime();
+
+            DossierRelatedCollaborator drc = new DossierRelatedCollaborator(collaborator, dossier, fromDate, toDate);
+            drcs.add(drc);
+        }
+        dossierRelatedCollaboratorRepository.saveAll(drcs);
+
+        System.out.println("Populate works! ~30 dossiers de succession ajoutés (Gestion du Patrimoine - SPF Finances).");
+        Code linkKindCode = new Code(
+            "CLONE",
+            "gekloond door",
+            "cloned by",
+            "geklont von",
+            "cloné par",
+            "LINK_KIND"
+        );
+        codeRepository.save(linkKindCode);
+
+        LinkKind linkKind = new LinkKind(linkKindCode);
+        linkKindRepository.save(linkKind);
+
+        LinkedDossier linkedDossier = new LinkedDossier(
+            dossiers.get(0),
+            dossiers.get(1),
+            linkKind,
+            1
+        );
+        linkedDossierRepository.save(linkedDossier);
+
 
         System.out.println("30 dossiers de succession ajoutés.");
     }

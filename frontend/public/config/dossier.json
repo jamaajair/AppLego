@@ -1,0 +1,14 @@
+{
+  "title": "Dossier",
+  "fields": [
+    { "name": "ref", "label": "Référence", "type": "text", "required": true, "default": "" },
+    { "name": "label", "label": "Libellé", "type": "text", "required": true, "default": "" },
+    { "name": "comments", "label": "Commentaires", "type": "textarea", "required": false, "default": "" },
+    { "name": "startNoLaterThan", "label": "A débuter avant le: ", "type": "date", "required": false, "default": "" },
+    { "name": "expectCompletion", "label": "Date espérée de complétion: ", "type": "date", "required": false, "default": "" },
+    { "name": "type", "label": "Type", "type": "select", "options": {
+      "COMP": "Succession complexe",
+      "SIMP": "Simple succession"
+    }, "required": true, "default": "" }
+  ]
+}

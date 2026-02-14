@@ -9,7 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Entity
@@ -32,7 +34,7 @@ public class DocumentSet {
 
     @ManyToOne
     @JoinColumn(name = "bound_to_dossier", referencedColumnName = "ref")
-    private Dossier dossier;
+    private Dossier boundToDossier;
 
 
 }

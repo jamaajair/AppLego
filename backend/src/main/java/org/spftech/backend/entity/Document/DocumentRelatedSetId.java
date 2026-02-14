@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,11 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DocumentRelatedSetIdComposite implements Serializable {
+public class DocumentRelatedSetId implements Serializable {
 
-    @Column(name = "DOCUMENT")
-    private Long documentN;
+    @Column(name = "document")
+    private Long document;
 
-    @Column(name = "IN_SET")
-    private Long inSetN;
+    @Column(name = "in_set")
+    private Long inSet;
 }

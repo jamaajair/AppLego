@@ -32,7 +32,7 @@ export const api = {
     patch: async (endpoint: string, body: unknown, config?: AxiosRequestConfig) => {
         return await apiClient.patch(endpoint, body, config);
     },
-    delete: async (endpoint: string, config?: AxiosRequestConfig) => {
-        return await apiClient.delete(endpoint, config);
+    delete: async (endpoint: string, body: unknown, config?: AxiosRequestConfig) => {
+        return await apiClient.delete(endpoint, {...config, data: body });
     },
 };

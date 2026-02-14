@@ -4,12 +4,13 @@ Dialog, DialogActions, DialogContent, DialogTitle,
 Button, Select, MenuItem, FormControl, InputLabel, Typography, Box
 } from '@mui/material';
 import type { StakeholderEntry } from '../hooks/useStakeholder';
+import type {CodeDto} from "../types/config.ts";
 
 interface AddStakeholderDialogProps {
     open: boolean;
     onClose: () => void;
     parties: StakeholderEntry[];
-    roles: string[];
+    roles: CodeDto[];
     onSubmit: (partyRef: number, role?: string) => void;
 }
 

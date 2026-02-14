@@ -83,7 +83,7 @@ const Layout: FC<LayoutProps> = () => {
                 </AppBar>
 
             {/* Main Page */}
-            <Box component="main" sx={{flexGrow: 1, mt:2, p:3}}>
+            <Box component="main" sx={{flexGrow: 1, mt: '8px', mb: 8, p: 3, overflow: 'auto', height: 'calc(100vh - 64px - 64px)'}}>
                 <Outlet/>
             </Box>
 

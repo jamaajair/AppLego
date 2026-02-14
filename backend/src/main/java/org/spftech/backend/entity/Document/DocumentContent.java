@@ -1,14 +1,10 @@
 package org.spftech.backend.entity.Document;
 
-import java.sql.Clob;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import lombok.AllArgsConstructor;
@@ -22,17 +18,17 @@ import lombok.NoArgsConstructor;
 public class DocumentContent {
     
     @EmbeddedId
-    private DocumentContentIdComposite id;
+    private DocumentContentId id;
 
-    @MapsId("documentN")
+    @MapsId("docRef")
     @ManyToOne
-    @JoinColumn(name = "DOC_REF", referencedColumnName = "ref")
-    private LocalDocument document;
+    @JoinColumn(name = "doc_ref", referencedColumnName = "ref")
+    private LocalDocument docRef;
 
-    @Column(name = "IANA_CONTENT_TYPE", length = 200)
-    private String iana_content_type;
+    @Column(name = "iana_content_type", length = 200)
+    private String ianaContentType;
 
-    @Column(name = "CONTENT")
-    private Clob content;
-
+    @Lob
+    @Column(name="content", columnDefinition = "LONGTEXT")
+    private String content;
 }
