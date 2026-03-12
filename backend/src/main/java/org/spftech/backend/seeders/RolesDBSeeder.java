@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import org.spftech.backend.entity.Party.ParticipantRole;
+import org.spftech.backend.repository.CodeRepository;
 import org.spftech.backend.repository.ParticipantRoleRepository;
 import org.spftech.backend.entity.Code;
-import org.spftech.backend.repository.CodeRepository;
 
 @Component
 public class RolesDBSeeder implements CommandLineRunner {

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.spftech.backend.entity.*;
+import org.spftech.backend.entity.Document.DocumentRelatedSet;
 import org.spftech.backend.repository.*;
 
 @Component
@@ -42,44 +43,66 @@ public class DossierDBSeeder implements CommandLineRunner {
     @Autowired
     private DossierRelatedCollaboratorRepository dossierRelatedCollaboratorRepository;
 
+    @Autowired
+    private DocumentSetRepository documentSetRepository;
+
+    @Autowired
+    private DocumentRelatedSetRepository documentRelatedSetRepository;
+
+    @Autowired
+    private DocumentReferenceRepository documentReferenceRepository;
+
+    @Autowired
+    private DocumentContentRepository documentContentRepository;
+
+    @Autowired
+    private LocalDocumentRepository localDocumentRepository;
+
+    @Autowired
+    private DocumentTypeRepository documentTypeRepository;
+
+    @Autowired
+    private DocumentStateRepository documentStateRepository;
+
+    @Autowired
+    private DocumentRoleRepository documentRoleRepository;
+
+    @Autowired
+    private DocumentSetBindingRepository documentSetBindingRepository;
+
     @Override
     public void run(String... args) throws Exception {
-        dossierRelatedCollaboratorRepository.deleteAll();
-        dossierRelatedCollaboratorRepository.resetAutoIncr();
-        dossierRepository.deleteAll();
-        dossierTypeRepository.deleteAll();
-        dossierStateRepository.deleteAll();
-        collaboratorRepository.deleteAll();
-        collaboratorRepository.resetAutoIncr();
 
+        if (dossierRepository.count() > 0) {
+            System.out.println("ℹ Dossiers déjà existants, seeding ignoré.");
+            return;
+        }
+
+        // ── Collaborateurs ──────────────────────────────────────────────────────
         List<String> users = Arrays.asList("Nathan", "Jamaa", "Pierre", "Jerome", "Alexandre");
         List<Collaborator> collaborators = new ArrayList<>();
-        for (int i = 0; i < users.size(); i++) {
-            String name = users.get(i);
-            String userId =  users.get(i) + "Id";
-            Collaborator collaborator = new Collaborator(name, userId);
-            collaborators.add(collaborator);
+        for (String name : users) {
+            collaborators.add(new Collaborator(name, name + "Id"));
         }
         collaboratorRepository.saveAll(collaborators);
 
-        // Correction : l'ordre des paramètres attendu est (code, label_nl, label_en, label_fr, label_de, usage_context)
-        // et le code est généralement présent dans les diagrammes uml (sinon, en utiliser un court pour l'exemple).
+        // ── Codes types & états ─────────────────────────────────────────────────
         Code typeCode1 = new Code(
-            "SIMP",
-            "Eenvoudige nalatenschap",   // label_nl
-            "Simple succession",        // label_en
-            "Succession simple",        // label_fr
-            "Einfache Erbschaft",        // label_de
-            "DOSSIER_TYPE"
+                "SIMP",
+                "Eenvoudige nalatenschap",
+                "Simple succession",
+                "Succession simple",
+                "Einfache Erbschaft",
+                "DOSSIER_TYPE"
         );
 
         Code typeCode2 = new Code(
-            "COMP",              // code (court)
-            "Complexe nalatenschap",    // label_nl
-            "Complex succession",       // label_en
-            "Succession complexe",      // label_fr
-            "Komplexe Erbschaft",       // label_de
-            "DOSSIER_TYPE"
+                "COMP",
+                "Complexe nalatenschap",
+                "Complex succession",
+                "Succession complexe",
+                "Komplexe Erbschaft",
+                "DOSSIER_TYPE"
         );
 
         codeRepository.save(typeCode1);
@@ -90,21 +113,21 @@ public class DossierDBSeeder implements CommandLineRunner {
         codeRepository.save(stateCode1);
         codeRepository.save(stateCode2);
 
+        // ── Dossiers ────────────────────────────────────────────────────────────
         List<String> subjects = Arrays.asList(
-            "Jean Dupont", "Marie Dubois", "Baptiste De Smet", "Pieter Janssens", "Sophie Martin",
-            "Anne Leroy", "Thomas Van Dam", "Claire Bernard", "Vincent Lambert", "Isabelle Mercier",
-            "Erich Thielen", "Chantal Simon", "François Willems", "Katrien Maes", "Nicolas Devos",
-            "Laurette Vandenberghe", "Gaston Lambert", "Hélène Petit", "Marc Verhaeghe", "Elke Claes",
-            "Olivier Laurent", "Julie Simonet", "Stéphane Boulanger", "Katrijn Peeters", "Bernard Renaud",
-            "Céline Roussel", "Wim Jacobs", "Annelies Moens", "Gérard Bertrand", "Hal Anne"
+                "Jean Dupont", "Marie Dubois", "Baptiste De Smet", "Pieter Janssens", "Sophie Martin",
+                "Anne Leroy", "Thomas Van Dam", "Claire Bernard", "Vincent Lambert", "Isabelle Mercier",
+                "Erich Thielen", "Chantal Simon", "François Willems", "Katrien Maes", "Nicolas Devos",
+                "Laurette Vandenberghe", "Gaston Lambert", "Hélène Petit", "Marc Verhaeghe", "Elke Claes",
+                "Olivier Laurent", "Julie Simonet", "Stéphane Boulanger", "Katrijn Peeters", "Bernard Renaud",
+                "Céline Roussel", "Wim Jacobs", "Annelies Moens", "Gérard Bertrand", "Hal Anne"
         );
 
         List<Dossier> dossiers = new ArrayList<>();
 
         for (int i = 1; i <= subjects.size(); i++) {
             String ref = String.format("SUC-%03d", i);
-            String name = subjects.get(i - 1);
-            String title = "Succession de " + name;
+            String title = "Succession de " + subjects.get(i - 1);
             String description = "Dossier de succession.";
 
             Code type = (i % 2 == 0) ? typeCode1 : typeCode2;
@@ -112,6 +135,9 @@ public class DossierDBSeeder implements CommandLineRunner {
 
             DossierType dossierType = new DossierType(type);
             DossierState dossierState = new DossierState(state);
+
+            dossierTypeRepository.save(dossierType);
+            dossierStateRepository.save(dossierState);
 
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.DAY_OF_MONTH, -i * 7);
@@ -122,72 +148,47 @@ public class DossierDBSeeder implements CommandLineRunner {
             Date dateOpened = openCal.getTime();
 
             Calendar closeCal = (Calendar) cal.clone();
-            if (state == stateCode2) {
-                closeCal.add(Calendar.DAY_OF_MONTH, 30 + (i % 4) * 30);
-            } else {
-                closeCal.add(Calendar.DAY_OF_MONTH, 90);
-            }
+            closeCal.add(Calendar.DAY_OF_MONTH, (state == stateCode2) ? 30 + (i % 4) * 30 : 90);
             Date dateClosed = closeCal.getTime();
 
-            Dossier d = new Dossier(
-                ref,
-                dossierType,
-                title,
-                dateCreated,
-                description,
-                dossierState,
-                dateOpened,
-                dateClosed
-            );
-
-            dossierTypeRepository.save(dossierType);
-            dossierStateRepository.save(dossierState);
-
-            dossiers.add(d);
+            dossiers.add(new Dossier(ref, dossierType, title, dateCreated, description, dossierState, dateOpened, dateClosed));
         }
 
         dossierRepository.saveAll(dossiers);
 
+        // ── Collaborateurs liés aux dossiers ────────────────────────────────────
         List<DossierRelatedCollaborator> drcs = new ArrayList<>();
-        for(int i=0; i < dossiers.size(); i++){
-            Collaborator collaborator = collaborators.get(i % collaborators.size());
-            Dossier dossier = dossiers.get(i);
-
+        for (int i = 0; i < dossiers.size(); i++) {
             Calendar cal = Calendar.getInstance();
             Date fromDate = cal.getTime();
+            cal.add(Calendar.DAY_OF_MONTH, 90);
+            Date toDate = cal.getTime();
 
-            Calendar closeCal = (Calendar) cal.clone();
-            closeCal.add(Calendar.DAY_OF_MONTH, 90);
-            Date toDate = closeCal.getTime();
-
-            DossierRelatedCollaborator drc = new DossierRelatedCollaborator(collaborator, dossier, fromDate, toDate);
-            drcs.add(drc);
+            drcs.add(new DossierRelatedCollaborator(
+                    collaborators.get(i % collaborators.size()),
+                    dossiers.get(i),
+                    fromDate,
+                    toDate
+            ));
         }
         dossierRelatedCollaboratorRepository.saveAll(drcs);
 
-        System.out.println("Populate works! ~30 dossiers de succession ajoutés (Gestion du Patrimoine - SPF Finances).");
+        // ── LinkKind & LinkedDossier ────────────────────────────────────────────
         Code linkKindCode = new Code(
-            "CLONE",
-            "gekloond door",
-            "cloned by",
-            "geklont von",
-            "cloné par",
-            "LINK_KIND"
+                "CLONE",
+                "gekloond door",
+                "cloned by",
+                "geklont von",
+                "cloné par",
+                "LINK_KIND"
         );
         codeRepository.save(linkKindCode);
 
         LinkKind linkKind = new LinkKind(linkKindCode);
         linkKindRepository.save(linkKind);
 
-        LinkedDossier linkedDossier = new LinkedDossier(
-            dossiers.get(0),
-            dossiers.get(1),
-            linkKind,
-            1
-        );
-        linkedDossierRepository.save(linkedDossier);
+        linkedDossierRepository.save(new LinkedDossier(dossiers.get(0), dossiers.get(1), linkKind, 1));
 
-
-        System.out.println("30 dossiers de succession ajoutés.");
+        System.out.println("✔ 30 dossiers de succession ajoutés (Gestion du Patrimoine - SPF Finances).");
     }
 }

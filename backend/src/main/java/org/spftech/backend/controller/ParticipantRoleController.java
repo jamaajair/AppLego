@@ -1,21 +1,18 @@
 package org.spftech.backend.controller;
 
 import org.spftech.backend.entity.Party.ParticipantRole;
-import org.springframework.web.bind.annotation.*;
-
-import org.spftech.backend.repository.ParticipantRoleRepository;
 import org.spftech.backend.repository.CodeRepository;
-
+import org.spftech.backend.repository.ParticipantRoleRepository;
+import org.springframework.web.bind.annotation.*;
 import org.spftech.backend.dto.CodeDto;
 import org.spftech.backend.service.CodeMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
-
+import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/user/dossiers/participant-roles")
+@PreAuthorize("hasAnyRole('EMPLOYEES', 'ADMIN', 'SUPERVISORS')")
 public class ParticipantRoleController {
     @Autowired
     private ParticipantRoleRepository repo;

@@ -1,4 +1,4 @@
-export interface Code{
+export type Code = {
   code: string;
   labelNl: string;
   labelEn: string;

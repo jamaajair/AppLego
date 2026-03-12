@@ -1,4 +1,5 @@
 package org.spftech.backend.entity.Document;
+import org.spftech.backend.entity.Asset;
 import org.spftech.backend.entity.Dossier;
 
 import jakarta.persistence.Column;
@@ -8,14 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Entity
-@Table(name = "document_set")
 @Data
 @NoArgsConstructor
 public class DocumentSet {
@@ -25,13 +24,17 @@ public class DocumentSet {
     @Column(name = "ref")
     private Long ref;
 
-    @Column(name = "label", length = 250)
+    @Column(length = 250)
     private String label;
 
-    // BINDING
+    @ManyToOne
+    @JoinColumn(name = "binding", referencedColumnName = "code")
+    private DocumentSetBinding binding;
 
-    // BOUND TO ASSET
-
+    @ManyToOne
+    @JoinColumn(name = "bound_to_asset", referencedColumnName = "id")
+    private Asset boundToAsset;
+    
     @ManyToOne
     @JoinColumn(name = "bound_to_dossier", referencedColumnName = "ref")
     private Dossier boundToDossier;

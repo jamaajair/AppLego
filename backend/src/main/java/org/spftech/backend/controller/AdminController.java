@@ -7,18 +7,18 @@ import org.spftech.backend.repository.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import jakarta.persistence.EntityNotFoundException;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/")
+@PreAuthorize("hasRole('ADMIN')")
+//@todo : do we have to give access to supervisors? /!\
 public class AdminController{
     private final DossierRepository dossierRepository;
     private final DossierRelatedCollaboratorRepository drcRepository;

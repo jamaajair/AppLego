@@ -1,0 +1,13 @@
+package org.spftech.backend.ruleunit
+
+unit ExpertRoleValidationUnit
+
+import org.spftech.backend.entity.Party.ParticipantRole
+
+// Group 3: only ROLE_EXP is allowed to be linked to a dossier
+rule "Validate expert role requirements"
+when
+    /roles[ code.codeValue != "ROLE_EXP" ]
+then
+    validationMessages.add("Validation Error: Only expert roles (ROLE_EXP) are allowed");
+end

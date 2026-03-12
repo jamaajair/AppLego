@@ -2,10 +2,11 @@ package org.spftech.backend.entity.Document;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,12 +17,12 @@ import lombok.NoArgsConstructor;
 public class DocumentReference {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ref")
     private Long ref;
 
-    @MapsId 
-    @OneToOne
-    @JoinColumn(name = "ref")
+    @OneToOne(optional = true)
+    @JoinColumn(name = "local_document_ref", referencedColumnName = "ref", nullable = true, unique = true)
     private LocalDocument localDocument;
 
     @ManyToOne
@@ -31,10 +32,10 @@ public class DocumentReference {
     @Column(name = "notes", length = 1000)
     private String notes;
 
-    @Column(name = "id_doc_cdis", length = 100)
+    @Column(length = 100)
     private String idDocCdis;
 
-    @Column(name = "id_doc_uri", length = 500)
+    @Column(length = 500)
     private String idDocUri;
 
     @Column(name = "is_doc_local")

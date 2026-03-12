@@ -26,12 +26,16 @@ repositories {
 
 ext {
     set('snippetsDir', file("build/generate d-snippets"))
+    set('flowableVersion', '7.2.0')
+    set('droolsVersion', '8.44.0.Final')
 }
 
 dependencies {
-    //implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation "org.flowable:flowable-spring-boot-starter-process:${flowableVersion}"
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     //developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
@@ -41,6 +45,11 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    
+    // Drools dependencies for RuleUnit approach
+    implementation "org.drools:drools-ruleunits-engine:${droolsVersion}"
+    // Required for runtime DRL compilation (dynamic bytecode generation)
+    implementation "org.drools:drools-wiring-dynamic:${droolsVersion}"
 }
 
 tasks.named('test') {

@@ -1,0 +1,17 @@
+[
+  {
+    "field": "deploymentId",
+    "headerName": "ID",
+    "flex": 0.8
+  },
+  {
+    "field": "name",
+    "headerName": "Nom",
+    "flex": 1.5
+  },
+  {
+    "field": "deploymentTime",
+    "headerName": "Date de déploiement",
+    "flex": 0.8
+  }
+]

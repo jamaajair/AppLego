@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import type { PageConfig } from "../types/config";
 import { api } from "../services/api";
-import type { GenericFormResult } from "../types/GenericFormResult";
+import type { GenericFormResult } from "../types/genericFormResult.ts";
 
-export default function useGenericEdit<T = Record<string, unknown>>(
+export default function useGenericEdit(
+    submitUrl?: string,
     configPath?: string | null,
-    dataUrl?: string | null,
-    submitUrl?: string | null
+    dataUrl?: string | null
 ): GenericFormResult {
 
     const [config, setConfig] = useState<PageConfig | null>(null);
@@ -19,8 +19,6 @@ export default function useGenericEdit<T = Record<string, unknown>>(
 
     const initialValues = useRef<Record<string, unknown>>({});
     const navigate = useNavigate();
-    const params = useParams();
-    const id = params.id ?? null;
 
     useEffect(() => {
         if (!configPath) {
@@ -59,7 +57,6 @@ export default function useGenericEdit<T = Record<string, unknown>>(
             mounted = false;
             controller.abort();
         }
-
     }, [configPath]);
 
     useEffect(() => {
@@ -71,8 +68,8 @@ export default function useGenericEdit<T = Record<string, unknown>>(
             try {
                 setLoading(true);
 
-                const res = await api.get(dataUrl, { signal: controller.signal });
-
+                const res: Record<string, unknown> = await api.get(dataUrl, { signal: controller.signal });
+                console.log(res);
                 const dto = res?.data;
 
                 if (!dto) {
@@ -150,14 +147,7 @@ export default function useGenericEdit<T = Record<string, unknown>>(
             const payload = { ...values };
 
             const res = await api.patch(submitUrl, payload);
-
-            if ([200, 201, 204].includes(res.status)) {
-                navigate(0);
-                return;
-            }
-            setError(`HTTP ${res.status}`);
-
-
+            navigate(0);
         } catch (err: any) {
             if (err.name !== "AbortError") {
                 setError(String(err));

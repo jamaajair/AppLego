@@ -26,23 +26,21 @@ public class LocalDocument {
     @Column(name = "ref")
     private Long ref;
 
-    @OneToOne(mappedBy = "localDocument", cascade = CascadeType.ALL, optional = false)
+    @OneToOne(mappedBy = "localDocument", optional = true)
     private DocumentReference documentReference;
 
-    @Column(name = "label", length = 250, nullable = false)
+    @Column(length = 250)
     private String label;
 
     @ManyToOne
-    @JoinColumn(name = "type", referencedColumnName = "code", nullable = false)
+    @JoinColumn(name = "type", referencedColumnName = "code")
     private DocumentType type;
 
-    @Column(name = "published", nullable = false)
     private Date published;
 
     @ManyToOne
     @JoinColumn(name = "state", referencedColumnName = "code")
     private DocumentState state;
 
-    @Column(name = "archived_as_doc_ref")
     private short archivedAsDocRef; 
 }

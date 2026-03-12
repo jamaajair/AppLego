@@ -1,6 +1,19 @@
 import type {GridColDef} from "@mui/x-data-grid";
 import type {ColumnConfig} from "../types/config.ts";
 
+
+function isValidBpmnFile(file: File): boolean {
+    // Check file extension - only .bpmn20.xml is allowed
+    const fileName = file.name.toLowerCase();
+    const hasValidExtension = fileName.endsWith('.bpmn20.xml');
+    
+    // Check MIME type
+    const validMimeTypes = ['application/xml', 'text/xml'];
+    const hasValidMimeType = validMimeTypes.includes(file.type);
+    
+    return hasValidExtension && hasValidMimeType;
+}
+
 const formatEuropeanDate = (isoDate: string): string => {
     const date = new Date(isoDate);
     return date.toLocaleString('fr-FR', {
@@ -48,4 +61,4 @@ async function loadColumnsFromJson(url: string): Promise<GridColDef[]> {
     }));
 }
 
-export { formatEuropeanDate, getLabelByLanguage, loadColumnsFromJson };
+export { formatEuropeanDate, getLabelByLanguage, loadColumnsFromJson, isValidBpmnFile };

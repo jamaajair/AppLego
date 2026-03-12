@@ -28,7 +28,7 @@ public class DocumentContent {
     @Column(name = "iana_content_type", length = 200)
     private String ianaContentType;
 
-    @Lob
-    @Column(name="content", columnDefinition = "LONGTEXT")
-    private String content;
+    @Lob 
+    @Column(name = "content", columnDefinition = "MEDIUMBLOB")
+    private byte[] content;
 }

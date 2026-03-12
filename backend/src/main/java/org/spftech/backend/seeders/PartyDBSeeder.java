@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.spftech.backend.entity.*;
 import org.spftech.backend.entity.Party.*;
-
 import org.spftech.backend.repository.*;
 
 @Component
@@ -22,6 +21,10 @@ public class PartyDBSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // partyRepository.deleteAll();
+        if (partyRepository.count() > 0) {
+            System.out.println("Parties déjà existants, seeding ignoré.");
+            return;
+        }
 
         List<Party> parties = Arrays.asList(
             new Party(null, "Jamaa JAIR", PartyKind.PHYSICAL_PERSON, DesignationMethod.in_person, "85.01.15-123.45", null),

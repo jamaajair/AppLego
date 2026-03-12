@@ -2,17 +2,20 @@ package org.spftech.backend.controller;
 
 import java.util.List;
 
-import org.spftech.backend.repository.*;
 import org.spftech.backend.dto.*;
 import org.spftech.backend.entity.*;
 import org.spftech.backend.entity.Party.*;
+import org.spftech.backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.*;
 import org.spftech.backend.service.CodeMapper;
+import org.spftech.backend.service.DossierRelatedPartyService;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 @RestController
 @RequestMapping("/api/user/dossiers")
+@PreAuthorize("hasAnyRole('EMPLOYEES', 'ADMIN', 'SUPERVISORS')")
 public class DossierRelatedPartyController {
     CodeMapper codeMapper = new CodeMapper();
 
@@ -31,19 +34,14 @@ public class DossierRelatedPartyController {
     @Autowired
     private CodeRepository codeRepository;
 
+    @Autowired
+    private DossierRelatedPartyService dossierRelatedPartyService;
+
     @PostMapping("/{dossierRef}/add_stakeholder")
     public ResponseEntity<String> addStakeholder(
             @PathVariable String dossierRef,
             @RequestBody AddStakeholderDto dto
     ) {
-
-        Dossier dossier = dossierRepository.findById(dossierRef)
-                .orElse(null);
-
-        if (dossier == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Dossier not found.\n");
-        }
 
         Long partyRef = dto.partyRef();
         if (partyRef == null) {
@@ -51,44 +49,30 @@ public class DossierRelatedPartyController {
                     .body("No party assigned.\n");
         }
 
-        Party party = partyRepository.findById(partyRef)
-                .orElse(null);
+        try {
+            List<String> validationGroups = List.of("valid-dossier-state");
+            if (dto.role() != null) {
+                validationGroups = List.of("valid-dossier-state", "valid-participant-role", "valid-participant-role-exp");
+            }
+            
+            dossierRelatedPartyService.linkPartyToDossierWithRules(
+                dossierRef,
+                partyRef,
+                dto.role(),
+                validationGroups
+            );
 
-        if (party == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Party not found.\n");
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body("Stakeholder added successfully.\n");
+        } catch (RuntimeException e) {
+            String message = e.getMessage();
+            if (message != null && (message.contains("Dossier non trouvé") || message.contains("Partie non trouvée"))) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Error: " + message + "\n");
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error: " + message + "\n");
         }
-
-        if(relatedPartyRepository.findByDossierRefAndPartyRef(dossierRef, partyRef) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Stakeholder already linked to dossier.\n");
-        }
-
-        ParticipantRole role = new ParticipantRole();
-        if(dto.role() != null) {
-            Code code = codeRepository.findByCodeValueAndUsageContext(dto.role(), "PARTICIPANT_ROLE")
-                    .stream().findFirst().orElse(null);
-            role.setCode(code);
-        }
-
-
-        DossierRelatedParty relation =
-                relatedPartyRepository.findByDossierRefAndPartyRef(dossierRef, partyRef);
-
-        if (relation == null) {
-            relation = new DossierRelatedParty();
-            relation.setDossier(dossier);
-            relation.setParty(party);
-            relation.setParticipantRole(role);
-        }
-
-        participantRoleRepository.save(role);
-        relatedPartyRepository.save(relation);
-
-        System.out.println("Added stakeholder: Dossier " + dossierRef + " - Party " + partyRef + "Role: " + relation.getParticipantRole());
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body("Stakeholder added successfully.\n");
     }
 
     @GetMapping("/{dossierId}/parties")
@@ -102,5 +86,36 @@ public class DossierRelatedPartyController {
                         r.getParticipantRole() != null ? codeMapper.toDto(r.getParticipantRole().getCode()) : null
                 ))
                 .toList();
+    }
+
+    @DeleteMapping("/{dossierRef}/stakeholders/{partyRef}")
+    public ResponseEntity<Void> deleteStakeholder(
+            @PathVariable String dossierRef,
+            @PathVariable Long partyRef
+    ) {
+        Dossier dossier = dossierRepository.findById(dossierRef).orElse(null);
+        if (dossier == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Party party = partyRepository.findById(partyRef).orElse(null);
+        if (party == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        DossierRelatedParty relation = relatedPartyRepository.findByDossierRefAndPartyRef(dossierRef, partyRef);
+        if (relation == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        ParticipantRole role = relation.getParticipantRole();
+
+        relatedPartyRepository.delete(relation);
+
+        if (role != null) {
+            participantRoleRepository.delete(role);
+        }
+
+        return ResponseEntity.noContent().build();
     }
 }

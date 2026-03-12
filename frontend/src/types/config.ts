@@ -7,6 +7,7 @@ export type ColumnConfig = {
 };
 
 export type FieldConfig = {
+    multiple: boolean;
     name: string;
     label: string;
     type?: 'text' | 'textarea' | 'date' | 'select';

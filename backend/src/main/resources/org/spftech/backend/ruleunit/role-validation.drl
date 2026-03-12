@@ -1,0 +1,21 @@
+package org.spftech.backend.ruleunit
+
+unit RoleValidationUnit
+
+import org.spftech.backend.entity.Party.ParticipantRole
+
+// Group 2a: role must carry PARTICIPANT_ROLE usage context
+rule "Validate participant role code"
+when
+    /roles[ code.usageContext != "PARTICIPANT_ROLE" ]
+then
+    validationMessages.add("Validation Error: Invalid participant role");
+end
+
+// Group 2b: role must be one of the seeded roles (ROLE_REQ, ROLE_EXP, ROLE_ADV)
+rule "Validate participant role is seeded role"
+when
+    /roles[ code.codeValue != "ROLE_REQ", code.codeValue != "ROLE_EXP", code.codeValue != "ROLE_ADV" ]
+then
+    validationMessages.add("Validation Error: Invalid participant role. Must be ROLE_REQ, ROLE_EXP, or ROLE_ADV");
+end

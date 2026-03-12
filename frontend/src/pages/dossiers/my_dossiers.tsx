@@ -1,37 +1,44 @@
-import { useState, useEffect, type FC } from 'react';
-import type { Dossier } from '../../types/dossier.ts';
-import { api } from '../../services/api.ts';
-import GenericDataGrid from '../../components/ui/GenericDataGrid.tsx';
-import type { GridColDef } from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
-import {loadColumnsFromJson} from "../../services/utils.ts";
-import { useNavigate } from 'react-router-dom';
-import type {GridRowParams} from "@mui/x-data-grid";
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
-import type { LinkKind } from '../../types/linkKind.ts';
+import { useEffect, useState, type FC } from "react";
+import { useNavigate } from "react-router-dom";
+import type { GridColDef, GridRowParams } from "@mui/x-data-grid";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import AddIcon from "@mui/icons-material/Add";
+import Breadcrumbs from "@mui/material/Breadcrumbs";
+import Link from "@mui/material/Link";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
 
-
+import type { Dossier } from "../../types/dossier.ts";
+import { api } from "../../services/api.ts";
+import { loadColumnsFromJson } from "../../services/utils.ts";
+import GenericDataGrid from "../../components/ui/GenericDataGrid.tsx";
 
 const MyDossiers: FC = () => {
     const [dossiers, setDossiers] = useState<readonly Dossier[]>([]);
     const [columns, setColumns] = useState<GridColDef[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDossiers = async () => {
             try {
-                const response = await api.get('/user/my_dossiers');
-                const dossiers = response.data || [];
-                console.log("Response: ", response.data)
-                setDossiers(dossiers);
+                setLoading(true);
+                setError(null);
 
-                const cols = await loadColumnsFromJson("/config/my_dossiers_col.json");
+                const [response, cols] = await Promise.all([
+                    api.get("/user/my_dossiers"),
+                    loadColumnsFromJson("/config/my_dossiers_col.json"),
+                ]);
+
+                setDossiers(response.data || []);
                 setColumns(cols);
             } catch (err) {
-                setError('Failed to fetch dossiers.' + err);
+                setError(`Impossible de charger les dossiers. ${String(err)}`);
             } finally {
                 setLoading(false);
             }
@@ -42,36 +49,69 @@ const MyDossiers: FC = () => {
 
     const handleRowClick = (params: GridRowParams<Dossier>) => {
         const id = params?.id;
-        if (id) {
-            navigate(`/user/dossiers/${id}`);
-        }
+        if (id) navigate(`/user/dossiers/${id}`);
     };
 
     return (
-        <div>
-            <Typography variant="h4" gutterBottom>
-                Mes Dossiers
-            </Typography>
+        <Box sx={{ width: "100%", minWidth: 0, overflow: "hidden", flexDirection:"column", display:"flex" }}>
+            <Stack spacing={1.5} sx={{ mb: 2 }}>
+                <Breadcrumbs aria-label="breadcrumb">
+                    <Link
+                        underline="hover"
+                        color="inherit"
+                        onClick={() => navigate("/user/home")}
+                        sx={{ cursor: "pointer" }}
+                    >
+                        Accueil
+                    </Link>
+                    <Typography color="text.primary">Mes dossiers</Typography>
+                </Breadcrumbs>
 
-            <Typography variant="body2" gutterBottom>
-                Cliquez sur une ligne pour voir le détail du dossier.
-            </Typography>
+                <Stack
+                    direction={{ xs: "column", sm: "row" }}
+                    alignItems={{ xs: "stretch", sm: "center" }}
+                    justifyContent="space-between"
+                    spacing={2}
+                >
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="h4" sx={{ fontWeight: 900, letterSpacing: -0.3 }}>
+                            Mes dossiers
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Cliquez sur une ligne pour consulter le détail d’un dossier.
+                        </Typography>
+                    </Box>
 
-            <Button
-                variant={"contained"}
-                color={"primary"}
-                onClick={() => navigate('/user/dossiers/new')}
-                sx={{mb:2}}
-            >
-                <AddIcon />
-            </Button>
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={() => navigate("/user/dossiers/new")}
+                        >
+                            Nouveau dossier
+                        </Button>
+                    </Stack>
+                </Stack>
 
-            {loading ? (
-                <p>Chargement...</p>
-            ) : (
-                <GenericDataGrid<Dossier> rows={dossiers} columns={columns} error={error} getRowId={(row) => row.ref}  onRowClick={handleRowClick} />
-            )}
-        </div>
+                <Divider />
+
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ flexWrap: "wrap", paddingLeft: "2px" }}>
+                    <Chip size="small" label={`${dossiers.length} dossiers en cours`} variant="outlined" />
+                </Stack>
+            </Stack>
+
+            <Box sx={{ flexGrow: 1, minHeight: 0 }}>
+                <GenericDataGrid<Dossier>
+                    rows={dossiers}
+                    columns={columns}
+                    loading={loading}
+                    error={error}
+                    getRowId={(row) => row.ref}
+                    onRowClick={handleRowClick}
+                    toolbar
+                />
+            </Box>
+        </Box>
     );
 };
 

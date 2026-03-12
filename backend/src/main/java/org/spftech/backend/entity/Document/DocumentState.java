@@ -1,4 +1,6 @@
 package org.spftech.backend.entity.Document;
+import org.spftech.backend.entity.common.CodeEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-public class DocumentState{
+public class DocumentState implements CodeEntity {
 
     @Id
     @Column(name = "code", length = 15, nullable = false)

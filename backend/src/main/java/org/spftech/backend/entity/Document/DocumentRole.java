@@ -1,5 +1,7 @@
 package org.spftech.backend.entity.Document;
 
+import org.spftech.backend.entity.common.CodeEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -13,25 +15,25 @@ import lombok.NoArgsConstructor;
 @Table(name = "document_role")
 @Data
 @Entity
-public class DocumentRole {
+public class DocumentRole implements CodeEntity {
 
     @Id
-    @Column(name = "code", length=15, nullable=false)
+    @Column(length=15)
     private String code;
 
-    @Column(name = "label_nl", length=100, nullable=false)
+    @Column(length=100)
     private String labelNl;
 
-    @Column(name = "label_en", length=100, nullable=false)
+    @Column(length=100)
     private String labelEn;
 
-    @Column(name = "label_fr",length=100, nullable=false)
+    @Column(length=100)
     private String labelFr;
 
-    @Column(name = "label_de",length=100, nullable=false)
+    @Column(length=100)
     private String labelDe;
 
-    @Column(length=15, nullable=false)
+    @Column(length=15)
     private String cdisDoctype;
 
 

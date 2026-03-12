@@ -6,8 +6,21 @@ import org.spftech.backend.dto.LinkKindDTO;
 import org.spftech.backend.dto.LinkedDossierDTO;
 import org.spftech.backend.entity.Code;
 import org.spftech.backend.entity.LinkedDossier;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.server.ResponseStatusException;
 
 public class Utils {
+    public static <T, ID> T requireById(JpaRepository<T, ID> repo, ID id, String entityName) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, entityName + " id must not be null");
+        }
+        return repo.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, entityName + " not found with id: " + id));
+    }
+
+
     public static LinkedDossierDTO toDTO(LinkedDossier linkedDossier){
         return new LinkedDossierDTO(
             new DossierDto(

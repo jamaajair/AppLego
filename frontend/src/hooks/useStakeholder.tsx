@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { type CodeDto } from '../types/config';
 
@@ -16,16 +16,17 @@ export default function useStakeholder(dossierRef: string) {
 
     const [dossierParties, setDossierParties] = useState<StakeholderEntry[]>([]);
     const [availableParties, setAvailableParties] = useState<StakeholderEntry[]>([]);
-    const [roles, setRoles] = useState<string[]>([]);
+    const [roles, setRoles] = useState<CodeDto[]>([]);
 
     const [dialogOpen, setDialogOpen] = useState(false);
 
-    const loadDossierParties = async () => {
+    const loadDossierParties = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await api.get(`/user/dossiers/${dossierRef}/parties`);
-            console.log(res)
-            const formatted = res.map((p: any) => ({
+
+            const res = await api.get<StakeholderEntry[]>(`/user/dossiers/${dossierRef}/parties`);
+
+            const formatted = res.map((p) => ({
                 ref: p.partyRef,
                 label: p.label,
                 kind: p.kind ?? "Undefined",
@@ -34,23 +35,23 @@ export default function useStakeholder(dossierRef: string) {
 
             setDossierParties(formatted);
             setError(null);
+
         } catch (err) {
             console.error(err);
-            setError("Impossible de charger les parties du dossier");
+            setError("Unable to load dossier stakeholders");
         } finally {
             setLoading(false);
         }
-    };
+    }, [dossierRef]);
 
     const loadDialogData = async () => {
         try {
             setLoading(true);
-            const partiesResponse = await api.get(`/user/dossiers/parties`);
-
+            const partiesResponse = await api.get<StakeholderEntry[]>(`/user/dossiers/parties`);
             setAvailableParties(partiesResponse || []);
         } catch (err) {
             console.error(err);
-            setError('Impossible de charger les données du dialog');
+            setError('Unable to load available parties');
         } finally {
             setLoading(false);
         }
@@ -69,9 +70,11 @@ export default function useStakeholder(dossierRef: string) {
             await loadDossierParties();
             setDialogOpen(false);
 
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            setError("Erreur lors de l'ajout de la partie prenante");
+            // Extract error message from API response
+            const errorMessage = err.response?.data || "Erreur lors de l'ajout de la partie prenante";
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -80,12 +83,11 @@ export default function useStakeholder(dossierRef: string) {
     useEffect(() => {
         const loadRoles = async () => {
             try {
-                  const res = await api.get(`/user/dossiers/participant-roles`);
+                  const res = await api.get<CodeDto[]>(`/user/dossiers/participant-roles`);
                   setRoles(res || []);
-                  console.log("ROLES: ", res);
             } catch (err) {
                   console.error(err);
-                  setError("Impossible de charger les rôles");
+                  setError("Unable to load roles.");
             }
         };
 
